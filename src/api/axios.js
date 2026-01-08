@@ -58,7 +58,7 @@ const MOCK_DB = {
             ],
             sharedWith: []
         },
-        // Demo's Files (Partner)
+        // Demo's Files(Partner)
         {
             id: '301',
             name: 'Partner_Agreement.docx',
