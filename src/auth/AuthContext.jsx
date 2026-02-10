@@ -7,18 +7,22 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
     // Initialize token directly from localStorage
     const [token, setToken] = useState(() => localStorage.getItem('token'));
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const initAuth = async () => {
-            if (token && !user) {
+            if (token && user?.email) {
                 try {
-                    const userData = await authApi.getProfile();
-                    setUser(userData);
+                    const userData = await authApi.getProfile(user.email);
+                    setUser(prev => ({ ...prev, ...userData }));
+                    localStorage.setItem('user', JSON.stringify({ ...user, ...userData }));
                 } catch (error) {
                     console.error('Failed to fetch user profile', error);
-                    logout(); // Clear token if profile fetch fails
+                    logout();
                 }
             }
             setLoading(false);
@@ -27,13 +31,14 @@ export function AuthProvider({ children }) {
         if (token) {
             initAuth();
         } else {
-            setLoading(false); // No token, so not loading user profile
+            setLoading(false);
         }
-    }, [token]); // Depend on token to re-run if it changes (e.g., after login)
+    }, [token]);
 
     const login = async (email, password) => {
         const data = await authApi.login(email, password);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         return data;
@@ -42,14 +47,15 @@ export function AuthProvider({ children }) {
     const register = async (name, email, password) => {
         const data = await authApi.register(name, email, password);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         return data;
     };
 
     const logout = () => {
-        // Allow logout to see the login screen if desired, but user can just click "Login" to get back
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setToken(null);
         setUser(null);
     };

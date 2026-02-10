@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as fileApi from '../api/fileApi';
+import { formatBytes } from '../utils/format';
 import { Clock, DownloadCloud, RotateCw, ArrowLeft, File } from 'lucide-react';
 
 export default function FileVersions() {
@@ -88,13 +89,13 @@ export default function FileVersions() {
                                                 <Clock size={14} color={index === 0 ? '#34d399' : '#94a3b8'} />
                                             </div>
                                             <span style={{ fontWeight: index === 0 ? 'bold' : 'normal', color: index === 0 ? '#34d399' : 'inherit' }}>
-                                                {ver.label || `Version ${versions.length - index}`}
+                                                {ver.label || `Version ${ver.versionNumber}`}
                                                 {index === 0 && <span style={{ marginLeft: '8px', fontSize: '0.7rem', background: '#34d399', color: '#000', padding: '2px 6px', borderRadius: '4px' }}>CURRENT</span>}
                                             </span>
                                         </div>
                                     </td>
                                     <td>{new Date(ver.uploadedAt).toLocaleString()}</td>
-                                    <td>{ver.size}</td>
+                                    <td>{formatBytes(ver.size)}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button

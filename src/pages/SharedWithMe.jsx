@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as fileApi from '../api/fileApi';
+import { formatBytes } from '../utils/format';
 import { User, DownloadCloud, File, AlertCircle, Eye } from 'lucide-react';
 
 export default function SharedWithMe() {
@@ -39,9 +40,15 @@ export default function SharedWithMe() {
         }
     };
 
-    const handleRemove = (fileId) => {
+    const handleRemove = async (documentId, accessId) => {
         if (!confirm('Remove this file from your shared list?')) return;
-        setFiles(files.filter(f => f.id !== fileId));
+        try {
+            await fileApi.revokeAccess(documentId, accessId);
+            setFiles(files.filter(f => f.accessId !== accessId));
+            alert('File removed from your shared list');
+        } catch (err) {
+            alert('Failed to remove file');
+        }
     };
 
     if (loading) return <div className="text-center" style={{ padding: '4rem' }}><span className="loader"></span></div>;
@@ -78,21 +85,43 @@ export default function SharedWithMe() {
                                         </td>
                                         <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                                                <User size={14} /> {file.owner}
+                                                <User size={14} /> {file.ownerName}
                                             </div>
                                         </td>
                                         <td>
-                                            <span style={{
-                                                fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px',
+                                            <div style={{
+                                                display: 'inline-flex',
+                                                flexDirection: 'column',
+                                                gap: '4px',
+                                                padding: '8px 12px',
+                                                borderRadius: '8px',
                                                 background: file.accessType === 'Permanent' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                                color: file.accessType === 'Permanent' ? '#60a5fa' : '#fbbf24',
-                                                border: `1px solid ${file.accessType === 'Permanent' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`
+                                                border: `1px solid ${file.accessType === 'Permanent' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`,
+                                                minWidth: '120px'
                                             }}>
-                                                {file.accessType}
-                                                {file.expiresAt && <span style={{ display: 'block', fontSize: '0.65rem', marginTop: '2px' }}>Expires: {new Date(file.expiresAt).toLocaleDateString()}</span>}
-                                            </span>
+                                                <span style={{
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: 600,
+                                                    color: file.accessType === 'Permanent' ? '#60a5fa' : '#fbbf24',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.025em'
+                                                }}>
+                                                    {file.accessType}
+                                                </span>
+                                                {file.expiresAt && (
+                                                    <span style={{
+                                                        fontSize: '0.7rem',
+                                                        color: 'rgba(255,255,255,0.6)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}>
+                                                        Expires: {new Date(file.expiresAt).toLocaleDateString()}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td>{file.size}</td>
+                                        <td>{formatBytes(file.size)}</td>
                                         <td>
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 <button onClick={() => handlePreview(file.id)} className="action-btn" title="Preview">
@@ -101,7 +130,7 @@ export default function SharedWithMe() {
                                                 <button onClick={() => handleDownload(file.id)} className="action-btn btn-download">
                                                     <DownloadCloud size={14} /> Download
                                                 </button>
-                                                <button onClick={() => handleRemove(file.id)} className="action-btn" style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+                                                <button onClick={() => handleRemove(file.id, file.accessId)} className="action-btn" style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
                                                     Remove
                                                 </button>
                                             </div>

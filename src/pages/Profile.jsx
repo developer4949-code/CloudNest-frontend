@@ -11,8 +11,9 @@ export default function Profile() {
     useEffect(() => {
         // Fetch fresh profile data
         const loadProfile = async () => {
+            if (!user?.email) return;
             try {
-                const data = await authApi.getProfile();
+                const data = await authApi.getProfile(user.email);
                 setProfileData(data);
             } catch (err) {
                 console.error('Failed to load profile');
@@ -21,7 +22,7 @@ export default function Profile() {
             }
         };
         loadProfile();
-    }, []);
+    }, [user?.email]);
 
     if (loading) return <div className="text-center" style={{ padding: '4rem' }}><span className="loader"></span></div>;
 

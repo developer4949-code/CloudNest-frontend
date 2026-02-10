@@ -54,7 +54,7 @@ export default function Register() {
                             onChange={handleChange}
                             required
                             placeholder="Enter your name"
-                            autocomplete="name"
+                            autoComplete="name"
                         />
                     </div>
                     <div className="form-group">
@@ -67,7 +67,7 @@ export default function Register() {
                             onChange={handleChange}
                             required
                             placeholder="Enter your email"
-                            autocomplete="username"
+                            autoComplete="username"
                         />
                     </div>
                     <div className="form-group">
@@ -80,7 +80,7 @@ export default function Register() {
                             onChange={handleChange}
                             required
                             placeholder="Create a password"
-                            autocomplete="new-password"
+                            autoComplete="new-password"
                         />
                     </div>
                     <div className="form-group">
@@ -93,7 +93,7 @@ export default function Register() {
                             onChange={handleChange}
                             required
                             placeholder="Confirm your password"
-                            autocomplete="new-password"
+                            autoComplete="new-password"
                         />
                     </div>
                     <button type="submit" className="btn-primary" disabled={loading}>

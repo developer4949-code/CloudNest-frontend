@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as filesApi from '../api/fileApi';
+import { formatBytes } from '../utils/format';
 import { DownloadCloud, Trash2, File, AlertCircle, Share2, History, Eye, Users } from 'lucide-react';
 import ShareModal from '../components/ShareModal';
 import ManageAccessModal from '../components/ManageAccessModal';
@@ -96,7 +97,7 @@ export default function Files() {
                                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{new Date(file.uploadedAt).toLocaleDateString()}</span>
                                             </div>
                                         </td>
-                                        <td>{file.size}</td>
+                                        <td>{formatBytes(file.size)}</td>
                                         <td>
                                             <span style={{
                                                 padding: '2px 8px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', fontSize: '0.8rem'
@@ -109,10 +110,10 @@ export default function Files() {
                                                 <button onClick={() => handlePreview(file.id)} className="action-btn" title="Preview">
                                                     <Eye size={16} />
                                                 </button>
-                                                <button onClick={() => handleDownload(file.fileId || file.id)} className="action-btn btn-download" title="Download">
+                                                <button onClick={() => file.id && handleDownload(file.id)} className="action-btn btn-download" title="Download">
                                                     <DownloadCloud size={16} />
                                                 </button>
-                                                <button onClick={() => navigate(`/files/${file.id}/versions`)} className="action-btn" title="History" style={{ color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}>
+                                                <button onClick={() => file.id && navigate(`/files/${file.id}/versions`)} className="action-btn" title="History" style={{ color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}>
                                                     <History size={16} />
                                                 </button>
                                                 <button onClick={() => setSharingFile(file)} className="action-btn" title="Share" style={{ color: '#a78bfa', borderColor: 'rgba(167, 139, 250, 0.3)' }}>
@@ -121,7 +122,7 @@ export default function Files() {
                                                 <button onClick={() => setManagingAccessFile(file)} className="action-btn" title="Manage Access" style={{ color: '#34d399', borderColor: 'rgba(52, 211, 153, 0.3)' }}>
                                                     <Users size={16} />
                                                 </button>
-                                                <button onClick={() => handleDelete(file.fileId || file.id)} className="action-btn btn-delete" title="Delete">
+                                                <button onClick={() => file.id && handleDelete(file.id)} className="action-btn btn-delete" title="Delete">
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
