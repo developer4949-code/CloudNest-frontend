@@ -32,10 +32,17 @@ export default function SharedWithMe() {
     };
 
     const handlePreview = async (fileId) => {
+        const newWindow = window.open('about:blank', '_blank');
         try {
             const url = await fileApi.getPreviewUrl(fileId);
-            window.open(url, '_blank');
+            if (newWindow) {
+                newWindow.location.href = url;
+            } else {
+                window.location.href = url;
+            }
         } catch (err) {
+            console.error('Preview error:', err);
+            if (newWindow) newWindow.close();
             alert('Failed to get preview URL');
         }
     };

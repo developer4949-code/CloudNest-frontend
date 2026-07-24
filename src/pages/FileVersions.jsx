@@ -42,11 +42,18 @@ export default function FileVersions() {
     };
 
     const handlePreview = async (versionId) => {
+        const newWindow = window.open('about:blank', '_blank');
         try {
             // For version preview, we might need a different endpoint, but for now use file preview
             const url = await fileApi.getPreviewUrl(fileId);
-            window.open(url, '_blank');
+            if (newWindow) {
+                newWindow.location.href = url;
+            } else {
+                window.location.href = url;
+            }
         } catch (err) {
+            console.error('Preview error:', err);
+            if (newWindow) newWindow.close();
             alert('Failed to get preview URL');
         }
     };
